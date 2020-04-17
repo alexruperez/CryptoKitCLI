@@ -19,27 +19,35 @@ public extension CryptoKitCLI {
     struct UUIDCommand: ParsableCommand {
         public static var configuration = CommandConfiguration(
             commandName: "uuid",
-            abstract: "Create or validate a universally unique value."
+            abstract: "Universally unique value."
         )
 
-        @Argument(help: "Input string to validate.")
-        public var input: String?
+        @Option(help: "Validate UUID string or file path.")
+        public var validate: String?
+
+        public var validateString: String? {
+            guard let validatePath = validate else {
+                return validate
+            }
+            do {
+                return try Path(validatePath).read().trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+            } catch {
+                return validate
+            }
+        }
 
         public init() {}
 
         public func run() throws {
-            guard let input = input else {
-                print("Universally unique value".underline)
+            guard let validate = validateString else {
                 print(UUID().uuidString.bold)
                 throw ExitCode.success
             }
-            if let uuid = UUID(uuidString: input) {
+            if UUID(uuidString: validate) != nil {
                 print("Valid".underline.green)
-                print(uuid.uuidString.bold)
                 throw ExitCode.success
             } else {
                 print("Invalid".underline.red)
-                print(input.bold)
                 throw ExitCode.failure
             }
         }
@@ -48,7 +56,6 @@ public extension CryptoKitCLI {
 
 public enum Digest: String, ExpressibleByArgument {
     public static let algorithm = "SHA-2"
-    public var bitCount: Int { Int(String(rawValue.suffix(3))) ?? 0 }
 
     case sha512
     case sha384
@@ -127,7 +134,6 @@ public extension CryptoKitCLI {
         public init() {}
 
         public func run() throws {
-            print("\(Digest.algorithm) hash with a \(digest.bitCount)-bit digest".underline)
             print(digest.hash(inputData).bold)
             throw ExitCode.success
         }
@@ -160,7 +166,7 @@ public extension CryptoKitCLI {
                 help: "\(Digest.algorithm) hash with the chosen digest.")
         public var digest: Digest
 
-        @Option(help: "Validate hash message authentication code.")
+        @Option(help: "Validate HMAC string or file path.")
         public var validate: String?
 
         @Argument(help: "Symmetric key string or file path.")
@@ -190,17 +196,14 @@ public extension CryptoKitCLI {
         public func run() throws {
             guard let validate = validate else {
                 let authenticationCode = digest.authenticationCode(data: inputData, key: symmetricKey)
-                print("Hash message authentication code".underline)
                 print(authenticationCode.bold)
                 throw ExitCode.success
             }
             if digest.isValid(code: validate.hexData, data: inputData, key: symmetricKey) {
                 print("Valid".underline.green)
-                print(validate.bold)
                 throw ExitCode.success
             } else {
                 print("Invalid".underline.red)
-                print(validate.bold)
                 throw ExitCode.failure
             }
         }
