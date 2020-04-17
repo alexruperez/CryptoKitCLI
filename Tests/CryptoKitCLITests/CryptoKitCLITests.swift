@@ -20,7 +20,7 @@ final class CryptoKitCLITests: XCTestCase {
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
         let output = String(data: data, encoding: .utf8)
 
-        XCTAssertEqual(output, "Hello, CryptoKitCLI!\n")
+        XCTAssert(output?.hasPrefix("OVERVIEW") == true)
     }
 
     var productsDirectory: URL {
