@@ -75,6 +75,17 @@ public enum Digest: String, ExpressibleByArgument {
             return SHA256.authenticationCode(data: data, key: key)
         }
     }
+
+    public func isValid(code: Data, data: Data, key: SymmetricKey) -> Bool {
+        switch self {
+        case .sha512:
+            return SHA512.isValid(code: code, data: data, key: key)
+        case .sha384:
+            return SHA384.isValid(code: code, data: data, key: key)
+        case .sha256:
+            return SHA256.isValid(code: code, data: data, key: key)
+        }
+    }
 }
 
 public extension HashFunction {
@@ -84,6 +95,10 @@ public extension HashFunction {
 
     static func authenticationCode(data: Data, key: SymmetricKey) -> String {
         HMAC<Self>.authenticationCode(for: data, using: key).string
+    }
+
+    static func isValid(code: Data, data: Data, key: SymmetricKey) -> Bool {
+        HMAC<Self>.isValidAuthenticationCode(code, authenticating: data, using: key)
     }
 }
 
@@ -125,6 +140,13 @@ public extension Sequence where Self.Element == UInt8 {
 
 public extension String {
     var data: Data { Data(utf8) }
+    var hexData: Data {
+        Data.init(stride(from: 0, to: count, by: 2).map {
+            self[index(startIndex, offsetBy: $0) ... index(startIndex, offsetBy: $0 + 1)]
+        }.compactMap {
+            UInt8($0, radix: 16)
+        })
+    }
 }
 
 public extension CryptoKitCLI {
@@ -137,6 +159,9 @@ public extension CryptoKitCLI {
         @Option(default: .sha512,
                 help: "\(Digest.algorithm) hash with the chosen digest.")
         public var digest: Digest
+
+        @Option(help: "Validate hash message authentication code.")
+        public var validate: String?
 
         @Argument(help: "Symmetric key string or file path.")
         public var key: String
@@ -163,10 +188,21 @@ public extension CryptoKitCLI {
         public init() {}
 
         public func run() throws {
-            let authenticationCode = digest.authenticationCode(data: inputData, key: symmetricKey)
-            print("Hash message authentication code".underline)
-            print(authenticationCode.bold)
-            throw ExitCode.success
+            guard let validate = validate else {
+                let authenticationCode = digest.authenticationCode(data: inputData, key: symmetricKey)
+                print("Hash message authentication code".underline)
+                print(authenticationCode.bold)
+                throw ExitCode.success
+            }
+            if digest.isValid(code: validate.hexData, data: inputData, key: symmetricKey) {
+                print("Valid".underline.green)
+                print(validate.bold)
+                throw ExitCode.success
+            } else {
+                print("Invalid".underline.red)
+                print(validate.bold)
+                throw ExitCode.failure
+            }
         }
     }
 }
