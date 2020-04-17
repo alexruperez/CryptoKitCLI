@@ -1,6 +1,6 @@
-import EXECUTABLE-NAMETests
+import CryptoKitCLITests
 import XCTest
 
 var tests = [XCTestCaseEntry]()
-tests += EXECUTABLE-NAMETests.allTests()
+tests += CryptoKitCLITests.allTests()
 XCTMain(tests)

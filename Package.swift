@@ -3,11 +3,11 @@
 import PackageDescription
 
 let package = Package(
-    name: "EXECUTABLE-NAME",
+    name: "CryptoKitCLI",
     products: [
         .executable(
-            name: "EXECUTABLE-NAME",
-            targets: ["EXECUTABLE-NAME"]
+            name: "CryptoKitCLI",
+            targets: ["CryptoKitCLI"]
         )
     ],
     dependencies: [
@@ -16,15 +16,15 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "EXECUTABLE-NAME",
+            name: "CryptoKitCLI",
             dependencies: [
                 .product(name: "ArgumentParser",
                          package: "swift-argument-parser")
             ]
         ),
         .testTarget(
-            name: "EXECUTABLE-NAMETests",
-            dependencies: ["EXECUTABLE-NAME"]
+            name: "CryptoKitCLITests",
+            dependencies: ["CryptoKitCLI"]
         )
     ]
 )

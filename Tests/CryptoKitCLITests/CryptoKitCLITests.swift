@@ -1,12 +1,12 @@
 import class Foundation.Bundle
 import XCTest
 
-final class EXECUTABLE-NAMETests: XCTestCase {
+final class CryptoKitCLITests: XCTestCase {
     func testExample() throws {
         guard #available(macOS 10.13, *) else {
             return
         }
-        let fooBinary = productsDirectory.appendingPathComponent("EXECUTABLE-NAME")
+        let fooBinary = productsDirectory.appendingPathComponent("CryptoKitCLI")
 
         let process = Process()
         process.executableURL = fooBinary
@@ -20,7 +20,7 @@ final class EXECUTABLE-NAMETests: XCTestCase {
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
         let output = String(data: data, encoding: .utf8)
 
-        XCTAssertEqual(output, "Hello, EXECUTABLE-NAME!\n")
+        XCTAssertEqual(output, "Hello, CryptoKitCLI!\n")
     }
 
     var productsDirectory: URL {

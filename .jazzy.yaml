@@ -1,11 +1,11 @@
-author: AUTHOR-NAME
-author_url: https://twitter.com/AUTHOR-HANDLE
+author: Alex Rupérez
+author_url: https://twitter.com/alexruperez
 clean: true
-copyright: Copyright (c) 2020 AUTHOR-NAME
-github_file_prefix: https://github.com/AUTHOR-HANDLE/EXECUTABLE-NAME/blob/master
-github_url: https://github.com/AUTHOR-HANDLE/EXECUTABLE-NAME
-module: EXECUTABLE-NAME
-root_url: https://AUTHOR-HANDLE.github.io/EXECUTABLE-NAME
+copyright: Copyright (c) 2020 Alex Rupérez
+github_file_prefix: https://github.com/alexruperez/CryptoKitCLI/blob/master
+github_url: https://github.com/alexruperez/CryptoKitCLI
+module: CryptoKitCLI
+root_url: https://alexruperez.github.io/CryptoKitCLI
 sourcekitten_sourcefile:
-  - docs/EXECUTABLE-NAME.json
+  - docs/CryptoKitCLI.json
 theme: fullwidth

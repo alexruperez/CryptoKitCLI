@@ -1,3 +1,3 @@
 mkdir -p docs
-sourcekitten doc --spm-module EXECUTABLE-NAME > docs/EXECUTABLE-NAME.json
+sourcekitten doc --spm-module CryptoKitCLI > docs/CryptoKitCLI.json
 jazzy

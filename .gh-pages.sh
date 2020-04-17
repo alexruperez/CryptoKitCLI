@@ -1,4 +1,4 @@
-git remote set-url origin git@github.com:AUTHOR-HANDLE/EXECUTABLE-NAME.git
+git remote set-url origin git@github.com:alexruperez/CryptoKitCLI.git
 git checkout -B gh-pages
 gem install jazzy
 ./.docs.sh
