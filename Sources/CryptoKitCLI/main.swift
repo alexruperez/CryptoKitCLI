@@ -19,31 +19,32 @@ public extension CryptoKitCLI {
     struct UUIDCommand: ParsableCommand {
         public static var configuration = CommandConfiguration(
             commandName: "uuid",
-            abstract: "Universally unique value."
+            abstract: "Create or validate a universally unique value."
         )
 
-        @Option(help: "Validate UUID string or file path.")
-        public var validate: String?
+        @Option(name: .shortAndLong,
+                help: "Validate UUID string or file path.")
+        public var check: String?
 
-        public var validateString: String? {
-            guard let validatePath = validate else {
-                return validate
+        public var checkString: String? {
+            guard let checkPath = check else {
+                return check
             }
             do {
-                return try Path(validatePath).read().trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+                return try string(checkPath)
             } catch {
-                return validate
+                return check
             }
         }
 
         public init() {}
 
         public func run() throws {
-            guard let validate = validateString else {
+            guard let check = checkString else {
                 print(UUID().uuidString.bold)
                 throw ExitCode.success
             }
-            if UUID(uuidString: validate) != nil {
+            if UUID(uuidString: check) != nil {
                 print("Valid".underline.green)
                 throw ExitCode.success
             } else {
@@ -116,7 +117,8 @@ public extension CryptoKitCLI {
             abstract: "Perform cryptographically secure hashing."
         )
 
-        @Option(default: .sha512,
+        @Option(name: .shortAndLong,
+                default: .sha512,
                 help: "\(Digest.algorithm) hash with the chosen digest.")
         public var digest: Digest
 
@@ -125,7 +127,7 @@ public extension CryptoKitCLI {
 
         public var inputData: Data {
             do {
-                return try Path(input).read()
+                return try data(input)
             } catch {
                 return input.data
             }
@@ -147,11 +149,23 @@ public extension Sequence where Self.Element == UInt8 {
 public extension String {
     var data: Data { Data(utf8) }
     var hexData: Data {
-        Data.init(stride(from: 0, to: count, by: 2).map {
+        Data(stride(from: 0, to: count, by: 2).map {
             self[index(startIndex, offsetBy: $0) ... index(startIndex, offsetBy: $0 + 1)]
-        }.compactMap {
+        }.map {
             UInt8($0, radix: 16)
         })
+    }
+}
+
+public extension ParsableCommand {
+    func string(_ path: String) throws -> String {
+        return try Path(path).read()
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    func data(_ path: String) throws -> Data {
+        let stringValue = try string(path)
+        return stringValue.data
     }
 }
 
@@ -159,15 +173,17 @@ public extension CryptoKitCLI {
     struct HMACCommand: ParsableCommand {
         public static var configuration = CommandConfiguration(
             commandName: "hmac",
-            abstract: "Hash message authentication algorithm."
+            abstract: "Create or validate hash message authentication."
         )
 
-        @Option(default: .sha512,
+        @Option(name: .shortAndLong,
+                default: .sha512,
                 help: "\(Digest.algorithm) hash with the chosen digest.")
         public var digest: Digest
 
-        @Option(help: "Validate HMAC string or file path.")
-        public var validate: String?
+        @Option(name: .shortAndLong,
+                help: "Validate HMAC string or file path.")
+        public var check: String?
 
         @Argument(help: "Symmetric key string or file path.")
         public var key: String
@@ -177,7 +193,7 @@ public extension CryptoKitCLI {
 
         public var symmetricKey: SymmetricKey {
             do {
-                return SymmetricKey(data: try Path(key).read())
+                return SymmetricKey(data: try data(key))
             } catch {
                 return SymmetricKey(data: key.data)
             }
@@ -185,21 +201,32 @@ public extension CryptoKitCLI {
 
         public var inputData: Data {
             do {
-                return try Path(input).read()
+                return try data(input)
             } catch {
                 return input.data
+            }
+        }
+
+        public var checkString: String? {
+            guard let checkPath = check else {
+                return check
+            }
+            do {
+                return try string(checkPath)
+            } catch {
+                return check
             }
         }
 
         public init() {}
 
         public func run() throws {
-            guard let validate = validate else {
+            guard let check = checkString else {
                 let authenticationCode = digest.authenticationCode(data: inputData, key: symmetricKey)
                 print(authenticationCode.bold)
                 throw ExitCode.success
             }
-            if digest.isValid(code: validate.hexData, data: inputData, key: symmetricKey) {
+            if digest.isValid(code: check.hexData, data: inputData, key: symmetricKey) {
                 print("Valid".underline.green)
                 throw ExitCode.success
             } else {
