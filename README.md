@@ -11,17 +11,25 @@
 
 ## 🌟 Features
 
-Create or validate UUID (universally unique value).
+✅ Create or validate UUID (universally unique value).
 
-Perform cryptographically secure hashing (SHA-2  hash with 512, 384 or 256-bit digest).
+✅ Perform cryptographically secure hashing (SHA-2  hash with 512, 384 or 256-bit digest).
 
-Create or validate HMAC (hash message authentication).
+✅ Create or validate HMAC (hash message authentication).
 
-Crypt and decrypt using AES-GCM cipher.
+✅ Crypt and decrypt using AES-GCM cipher.
 
-Crypt and decrypt using ChaCha20-Poly1305 cipher.
+✅ Crypt and decrypt using ChaCha20-Poly1305 cipher.
 
-Symmetric key auto-hash to SHA-256 if needed.
+✅ Symmetric key auto-hash to SHA-256 if needed.
+
+🚧 X25519 key agreement and ed25519 signatures.
+
+🚧 NIST P-521 signatures and key agreement.
+
+🚧 NIST P-384 signatures and key agreement.
+
+🚧 NIST P-256 signatures and key agreement.
 
 ## 🐒 Usage
 
@@ -34,9 +42,9 @@ $ cryptokit [subcommand]
 * `-h, --help`: Show `CryptoKitCLI` help information.
 * `--version`: Show `CryptoKitCLI` version.
 
-### Subcommands
+## Subcommands
 
-#### UUID
+### UUID
 
 ```sh
 $ cryptokit uuid
@@ -44,7 +52,7 @@ $ cryptokit uuid
 
 * `-c, --check <check>`: Validate UUID string or file path.
   
-#### SHA-2 Hashing
+### SHA-2 Hashing
 
 ```sh
 $ cryptokit hash
@@ -52,7 +60,7 @@ $ cryptokit hash
 
 * `-d, --digest <digest>`: SHA-2 hash with the chosen digest. (default: sha512)
 
-#### HMAC
+### HMAC
 
 ```sh
 $ cryptokit hmac
@@ -61,7 +69,7 @@ $ cryptokit hmac
 * `-d, --digest <digest>`: SHA-2 hash with the chosen digest. (default: sha512)
 * `-c, --check <check>`: Validate HMAC string or file path.
 
-#### AES-GCM
+### AES-GCM
 
 ```sh
 $ cryptokit aes
@@ -73,7 +81,7 @@ $ cryptokit aes
 * `-t, --tag <tag>`: Decrypt the input and verify authenticity using authentication tag and nonce.
 * `-s, --split `: Print authentication tag and nonce instead of combined data.
 
-#### ChaCha20-Poly1305
+### ChaCha20-Poly1305
 
 ```sh
 $ cryptokit poly
