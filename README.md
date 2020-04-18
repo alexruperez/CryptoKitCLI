@@ -1,5 +1,5 @@
 # CryptoKitCLI
-> A description of this tool.
+> Take Apple CryptoKit to the command line and perform cryptographic operations securely and efficiently.
 
 [![Twitter](https://img.shields.io/badge/contact-%40alexruperez-blue)](http://twitter.com/alexruperez)
 [![Swift](https://img.shields.io/badge/swift-5-orange)](https://swift.org)
@@ -11,29 +11,85 @@
 
 ## 🌟 Features
 
+Create or validate UUID (universally unique value).
 
+Perform cryptographically secure hashing (SHA-2  hash with 512, 384 or 256-bit digest).
+
+Create or validate HMAC (hash message authentication).
+
+Crypt and decrypt using AES-GCM cipher.
+
+Crypt and decrypt using ChaCha20-Poly1305 cipher.
+
+Symmetric key auto-hash to SHA-256 if needed.
 
 ## 🐒 Usage
-
-### Command Line
 
 Simply run:
 
 ```sh
-$ CryptoKitCLI [options]
+$ cryptokit [subcommand]
 ```
 
 * `-h, --help`: Show `CryptoKitCLI` help information.
 * `--version`: Show `CryptoKitCLI` version.
 
+### Subcommands
+
+#### UUID
+
+```sh
+$ cryptokit uuid
+```
+
+* `-c, --check <check>`: Validate UUID string or file path.
+  
+#### SHA-2 Hashing
+
+```sh
+$ cryptokit hash
+```
+
+* `-d, --digest <digest>`: SHA-2 hash with the chosen digest. (default: sha512)
+
+#### HMAC
+
+```sh
+$ cryptokit hmac
+```
+
+* `-d, --digest <digest>`: SHA-2 hash with the chosen digest. (default: sha512)
+* `-c, --check <check>`: Validate HMAC string or file path.
+
+#### AES-GCM
+
+```sh
+$ cryptokit aes
+```
+
+* `-n, --nonce <nonce>`: Nonce string or file path.
+* `-a, --auth <auth>`: Additional data string or file path.
+* `-d, --decrypt`: Decrypt the input and verify authenticity using combined data.
+* `-t, --tag <tag>`: Decrypt the input and verify authenticity using authentication tag and nonce.
+* `-s, --split `: Print authentication tag and nonce instead of combined data.
+
+#### ChaCha20-Poly1305
+
+```sh
+$ cryptokit poly
+```
+
+* `-n, --nonce <nonce>`: Nonce string or file path.
+* `-a, --auth <auth>`: Additional data string or file path.
+* `-d, --decrypt`: Decrypt the input and verify authenticity using combined data.
+* `-t, --tag <tag>`: Decrypt the input and verify authenticity using authentication tag and nonce.
+* `-s, --split `: Print authentication tag and nonce instead of combined data.
+
 ## 🛠 Compatibility
 
 - macOS 10.15+
-- Linux
 
 ## ⚙️ Installation
-
-Make sure Xcode 11.4+ is installed first.
 
 There're more than one way to install `CryptoKitCLI`.
 
@@ -50,6 +106,8 @@ $ mint install alexruperez/CryptoKitCLI
 ```
 
 ### Compiling from source:
+
+Make sure Xcode 11.4+ is installed first.
 
 ```sh
 $ git clone https://github.com/alexruperez/CryptoKitCLI.git

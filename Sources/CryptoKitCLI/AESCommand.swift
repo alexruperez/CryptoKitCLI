@@ -21,7 +21,7 @@ public struct AESCommand: CipherCommand {
     public var decrypt: Bool
 
     @Option(name: .shortAndLong,
-          help: "Decrypt the input and verify authenticity using authentication tag and nonce.")
+            help: "Decrypt the input and verify authenticity using authentication tag and nonce.")
     public var tag: String?
 
     @Flag(name: .shortAndLong,
@@ -35,6 +35,10 @@ public struct AESCommand: CipherCommand {
     public var input: String
 
     public init() {}
+
+    public var allowedKeyBytes: [Int] {
+        [16, 24, 32]
+    }
 
     public func nonceData<N: ContiguousBytes>() -> N? {
         guard let nonce = nonce else {
@@ -55,21 +59,6 @@ public struct AESCommand: CipherCommand {
             return try AES.GCM.Nonce(data: try hexData(nonce)) as? N
         } catch {
             return try? AES.GCM.Nonce(data: nonce.hexData) as? N
-        }
-    }
-
-    public func validate() throws {
-        let allowedKeySizes = [SymmetricKeySize.bits128.bitCount,
-                               SymmetricKeySize.bits192.bitCount,
-                               SymmetricKeySize.bits256.bitCount]
-        if !allowedKeySizes.contains(symmetricKey.bitCount) {
-            print("Incorrect key size, only 128, 192 or 256-bit keys are allowed".underline.red)
-            print("Tip: ".bold + "Key string length must be 16, 24 or 32")
-            throw ExitCode.validationFailure
-        }
-        if tag != nil && nonce == nil {
-            print("You need a valid nonce to decrypt".underline.red)
-            throw ExitCode.validationFailure
         }
     }
 
@@ -95,7 +84,6 @@ public struct AESCommand: CipherCommand {
             print("Tag".underline)
             print(sealedBox.tag.hexString.italic)
         }
-        throw ExitCode.success
     }
 
     public func decryptInput() throws {
@@ -118,6 +106,5 @@ public struct AESCommand: CipherCommand {
                                     using: symmetricKey)
         }
         print(data.utf8String.bold)
-        throw ExitCode.success
     }
 }

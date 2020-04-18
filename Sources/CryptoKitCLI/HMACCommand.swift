@@ -55,7 +55,7 @@ public struct HMACCommand: ParsableCommand {
     public func run() throws {
         guard let check = checkString else {
             let authenticationCode = digest.authenticationCode(data: inputData, key: symmetricKey)
-            print(authenticationCode.bold)
+            print(authenticationCode.hexString.bold)
             throw ExitCode.success
         }
         if digest.isValid(code: check.hexData, data: inputData, key: symmetricKey) {

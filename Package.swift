@@ -11,6 +11,15 @@ let package = Package(
         .executable(
             name: "CryptoKitCLI",
             targets: ["CryptoKitCLI"]
+        ),
+        .library(
+            name: "CryptoKitLib",
+            targets: ["CryptoKitCLI"]
+        ),
+        .library(
+            name: "CryptoKitLibDynamic",
+            type: .dynamic,
+            targets: ["CryptoKitCLI"]
         )
     ],
     dependencies: [

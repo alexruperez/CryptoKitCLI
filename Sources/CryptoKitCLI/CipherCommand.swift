@@ -15,6 +15,7 @@ public protocol CipherCommand: ParsableCommand {
 
     var authData: Data? { get }
     var tagHexData: Data? { get }
+    var allowedKeyBytes: [Int] { get }
     var symmetricKey: SymmetricKey { get }
     var inputData: Data { get }
     var inputHexData: Data { get }
@@ -50,12 +51,21 @@ public extension CipherCommand {
         }
     }
 
+    var allowedKeyBytes: [Int] {
+        [32]
+    }
+
     var symmetricKey: SymmetricKey {
+        var keyData: Data!
         do {
-            return SymmetricKey(data: try utf8Data(key))
+            keyData = try utf8Data(key)
         } catch {
-            return SymmetricKey(data: key.utf8Data)
+            keyData = key.utf8Data
         }
+        if !allowedKeyBytes.contains(keyData.count) {
+            keyData = Digest.sha256.hash(keyData)
+        }
+        return SymmetricKey(data: keyData)
     }
 
     var inputData: Data {
@@ -74,11 +84,40 @@ public extension CipherCommand {
         }
     }
 
-    func run() throws {
-        if tag != nil || decrypt {
-            try decryptInput()
-        } else {
-            try encryptInput()
+    func validate() throws {
+        if tag != nil, nonce == nil {
+            print("You need a valid nonce to decrypt".underline.red)
+            throw ExitCode.validationFailure
         }
+    }
+
+    func run() throws {
+        do {
+            if tag != nil || decrypt {
+                try decryptInput()
+            } else {
+                try encryptInput()
+            }
+        } catch let error as CryptoKitError {
+            print("Error".underline.red)
+            switch error {
+            case .incorrectKeySize:
+                print("A key is being deserialized with an incorrect key size.")
+            case .incorrectParameterSize:
+                print("The number of bytes passed for a given argument is incorrect.")
+            case .authenticationFailure:
+                print("The authentication tag or signature is incorrect.")
+            case let .underlyingCoreCryptoError(errorCode):
+                print("An unexpected error \(errorCode) at a lower-level occured.")
+            @unknown default:
+                print(error.localizedDescription)
+            }
+            throw ExitCode.failure
+        } catch {
+            print("Error".underline.red)
+            print(error.localizedDescription)
+            throw ExitCode.failure
+        }
+        throw ExitCode.success
     }
 }

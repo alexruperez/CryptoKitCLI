@@ -21,7 +21,7 @@ public struct ChaChaPolyCommand: CipherCommand {
     public var decrypt: Bool
 
     @Option(name: .shortAndLong,
-          help: "Decrypt the input and verify authenticity using authentication tag and nonce.")
+            help: "Decrypt the input and verify authenticity using authentication tag and nonce.")
     public var tag: String?
 
     @Flag(name: .shortAndLong,
@@ -58,29 +58,17 @@ public struct ChaChaPolyCommand: CipherCommand {
         }
     }
 
-    public func validate() throws {
-        if symmetricKey.bitCount != SymmetricKeySize.bits256.bitCount {
-            print("Incorrect key size, only 256-bit key is allowed".underline.red)
-            print("Tip: ".bold + "Key string length must be 32")
-            throw ExitCode.validationFailure
-        }
-        if tag != nil && nonce == nil {
-            print("You need a valid nonce to decrypt".underline.red)
-            throw ExitCode.validationFailure
-        }
-    }
-
     public func encryptInput() throws {
         var sealedBox: ChaChaPoly.SealedBox!
         if let authData = authData {
             sealedBox = try ChaChaPoly.seal(inputData,
-                                         using: symmetricKey,
-                                         nonce: nonceData(),
-                                         authenticating: authData)
+                                            using: symmetricKey,
+                                            nonce: nonceData(),
+                                            authenticating: authData)
         } else {
             sealedBox = try ChaChaPoly.seal(inputData,
-                                         using: symmetricKey,
-                                         nonce: nonceData())
+                                            using: symmetricKey,
+                                            nonce: nonceData())
         }
         if !split {
             print(sealedBox.combined.hexString.bold)
@@ -92,7 +80,6 @@ public struct ChaChaPolyCommand: CipherCommand {
             print("Tag".underline)
             print(sealedBox.tag.hexString.italic)
         }
-        throw ExitCode.success
     }
 
     public func decryptInput() throws {
@@ -100,21 +87,20 @@ public struct ChaChaPolyCommand: CipherCommand {
         if let tagHexData = tagHexData,
             let nonceHexData: ChaChaPoly.Nonce = nonceHexData() {
             sealedBox = try ChaChaPoly.SealedBox(nonce: nonceHexData,
-                                              ciphertext: inputHexData,
-                                              tag: tagHexData)
+                                                 ciphertext: inputHexData,
+                                                 tag: tagHexData)
         } else {
             sealedBox = try ChaChaPoly.SealedBox(combined: inputHexData)
         }
         let data: Data!
         if let authData = authData {
             data = try ChaChaPoly.open(sealedBox,
-                                    using: symmetricKey,
-                                    authenticating: authData)
+                                       using: symmetricKey,
+                                       authenticating: authData)
         } else {
             data = try ChaChaPoly.open(sealedBox,
-                                    using: symmetricKey)
+                                       using: symmetricKey)
         }
         print(data.utf8String.bold)
-        throw ExitCode.success
     }
 }

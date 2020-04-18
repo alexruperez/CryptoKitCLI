@@ -26,7 +26,7 @@ public struct HashCommand: ParsableCommand {
     public init() {}
 
     public func run() throws {
-        print(digest.hash(inputData).bold)
+        print(digest.hash(inputData).hexString.bold)
         throw ExitCode.success
     }
 }

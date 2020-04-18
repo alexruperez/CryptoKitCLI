@@ -4,12 +4,8 @@ import Foundation
 import PathKit
 
 public extension HashFunction {
-    static func hash(data: Data) -> String {
-        hash(data: data).hexString
-    }
-
-    static func authenticationCode(data: Data, key: SymmetricKey) -> String {
-        HMAC<Self>.authenticationCode(for: data, using: key).hexString
+    static func authenticationCode(data: Data, key: SymmetricKey) -> Data {
+        Data(HMAC<Self>.authenticationCode(for: data, using: key))
     }
 
     static func isValid(code: Data, data: Data, key: SymmetricKey) -> Bool {
@@ -27,7 +23,8 @@ public extension String {
     var hexData: Data {
         Data(stride(from: 0, to: count, by: 2).map {
             self[index(startIndex, offsetBy: $0) ... index(startIndex, offsetBy: $0 + 1)]
-        }.compactMap {
+        }
+        .compactMap {
             UInt8($0, radix: 16)
         })
     }
@@ -35,8 +32,7 @@ public extension String {
 
 public extension ParsableCommand {
     func string(_ path: String) throws -> String {
-        return try Path(path).read()
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+        try Path(path).read().trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     func utf8Data(_ path: String) throws -> Data {
